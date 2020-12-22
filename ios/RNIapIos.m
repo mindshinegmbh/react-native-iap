@@ -143,7 +143,7 @@ RCT_EXPORT_METHOD(buyProduct:(NSString*)sku
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     [[SKPaymentQueue defaultQueue] addPayment:payment];
-    [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [self addPromiseForKey:payment.productIdentifier resolve:resolve reject:reject];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -176,7 +176,7 @@ RCT_EXPORT_METHOD(buyProductWithOffer:(NSString*)sku
     payment.paymentDiscount = discount;
 
     [[SKPaymentQueue defaultQueue] addPayment:payment];
-    [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [self addPromiseForKey:payment.productIdentifier resolve:resolve reject:reject];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -199,7 +199,7 @@ RCT_EXPORT_METHOD(buyProductWithQuantityIOS:(NSString*)sku
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     payment.quantity = quantity;
     [[SKPaymentQueue defaultQueue] addPayment:payment];
-    [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [self addPromiseForKey:payment.productIdentifier resolve:resolve reject:reject];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -220,7 +220,7 @@ RCT_EXPORT_METHOD(buyProductWithoutAutoConfirm:(NSString*)sku
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     [[SKPaymentQueue defaultQueue] addPayment:payment];
-    [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [self addPromiseForKey:payment.productIdentifier resolve:resolve reject:reject];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -260,7 +260,7 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
   if (promotedPayment) {
     NSLog(@"\n\n\n  ***  buy promoted product. \n\n.");
     [[SKPaymentQueue defaultQueue] addPayment:promotedPayment];
-    [self addPromiseForKey:RCTKeyForInstance(promotedPayment.productIdentifier) resolve:resolve reject:reject];
+    [self addPromiseForKey:promotedPayment.productIdentifier resolve:resolve reject:reject];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -327,7 +327,7 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
       case SKPaymentTransactionStateFailed:
         NSLog(@"\n\n\n\n\n\n Purchase Failed  !! \n\n\n\n\n");
         [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
-        NSString *key = RCTKeyForInstance(transaction.payment.productIdentifier);
+        NSString *key = transaction.payment.productIdentifier;
         dispatch_sync(myQueue, ^{
           [self rejectPromisesForKey:key code:[self standardErrorCode:(int)transaction.error.code]
                              message:transaction.error.localizedDescription
@@ -371,7 +371,7 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
   }
   NSURL *receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
   NSDictionary* purchase = [self getPurchaseData:transaction];
-  [self resolvePromisesForKey:RCTKeyForInstance(transaction.payment.productIdentifier) value:purchase];
+  [self resolvePromisesForKey:transaction.payment.productIdentifier value:purchase];
 
   // additionally send event
   if (hasListeners) {
